@@ -11,7 +11,7 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     env:
       HOST: localhost
@@ -23,6 +23,7 @@ jobs:
     strategy:
       matrix:
         go_version: ['1.18', '1.17']
+        os: ['ubuntu-latest', 'ubuntu-18.04']
 
     services:
       postgres:
@@ -47,16 +48,16 @@ jobs:
         with:
           go-version: ${{ matrix.go_version }}
 
-      - name: Check Postgres
-        run: |
-          pg_isready -h localhost -p 5432 -U root -d root
-
       - name: Test
         run: go test -v main_test.go
 
   build:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: ['ubuntu-latest', 'ubuntu-18.04']
 
     steps:
       - uses: actions/checkout@v4
